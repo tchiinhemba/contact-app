@@ -22,7 +22,10 @@ exports.register = async function (req, res) {
             })
             return
         }
-        return res.send(login.errors)
+        req.flash('Success', 'User has successful created!');
+        req.session.save(function () {
+            return res.redirect('back')
+        })
 
     } catch (error) {
         console.log(error)
