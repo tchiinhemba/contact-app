@@ -34,3 +34,32 @@ exports.register = async function (req, res) {
     }
 
 }
+
+
+
+
+exports.login = async (req, res) => {
+    try {
+        const login = new Login(req.body);
+        await login.login();
+
+        if(login.errors.length > 0) {
+            req.flash('Errors', login.errors);
+            req.session.save(() => {
+                return res.redirect('back')
+            });
+            return;
+        }
+
+
+        req.flash('success', 'Success Loged')
+        req.session.user = login.user
+        req.session.save(() =>  {
+            return res.redirect('back')
+        })
+    } catch (error) {
+        console.log(error)
+        return res.render('404');
+    }
+    
+}
