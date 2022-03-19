@@ -1,5 +1,6 @@
 exports.middlewareGlobal = (req, res, next) => {
     res.locals.errors = req.flash('Errors');
+    res.locals.success = req.flash('Success');
     next();
   };
   
