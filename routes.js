@@ -11,7 +11,7 @@ route.get('/', homeController.index);
 
 // Login Routes
 route.get('/login/index', loginController.index);
-
+route
 
 
 module.exports = route;
