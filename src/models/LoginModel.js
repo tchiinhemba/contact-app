@@ -16,26 +16,36 @@ class Login {
     this.user = null;
   }
 
+  async login() {
+    this.validate();
+    if(this.errors.length > 0 ) return;
+    this.user = await LoginModel.findOne({ email: this.body.email });
+    
+    if(!this.user) {
+      this.errors.push('Invalid User...')
+      return;
+    }
+    if(bcryptjs.compareSync(this.body.password, this.user.password)) {
+      this.errors.push('Ivalid Password!')
+      this.user = null;
+      return;
+    }
+  }
+
   async register() {
     this.validate();
     if (this.errors.length > 0) return;
 
     await this.userExists();
 
-    try {
-      const salt = bcryptjs.genSaltSync();
-      this.body.password = bcryptjs.hashSync(this.body.password, salt);
-      this.user = await LoginModel.create(this.body)
-    } catch (error) {
-      console.log(error)
-
-    }
+    const salt = bcryptjs.genSaltSync();
+    this.body.password = bcryptjs.hashSync(this.body.password, salt);
+    this.user = await LoginModel.create(this.body)
   }
 
   async userExists() {
-    const user = await LoginModel.findOne({ email: this.body.email });
-
-    if(user) this.errors.push('User Exists!')
+    this.user = await LoginModel.findOne({ email: this.body.email });
+    if (this.user) this.errors.push('User Exists!')
   }
 
   validate() {
