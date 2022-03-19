@@ -17,25 +17,30 @@ class Login {
 
   async register() {
     this.validate();
-    if(this.errors.length > 0) return;
+    if (this.errors.length > 0) return;
 
-    this.user = await LoginModel.create(this.body)
+    try {
+      this.user = await LoginModel.create(this.body)
+    } catch (error) {
+      console.log(error)
+
+    }
   }
 
   validate() {
     this.cleanUp();
     // validate Email
-    if(!validator.isEmail(this.body.email)) this.errors.push('Invalid Email');
+    if (!validator.isEmail(this.body.email)) this.errors.push('Invalid Email');
 
-    if(this.body.password.length < 3 || this.body.password.length > 50) {
+    if (this.body.password.length < 3 || this.body.password.length > 50) {
       this.errors.push('Password length need be bigest than 3 chars')
     }
 
   }
 
   cleanUp() {
-    for(const key in this.body) {
-      if( typeof this.body[key] !== 'string') {
+    for (const key in this.body) {
+      if (typeof this.body[key] !== 'string') {
         this.body[key] = '';
       }
     }
