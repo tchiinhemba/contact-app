@@ -11,20 +11,25 @@ const LoginModel = mongoose.model('Login', LoginSchema);
 class Login {
   constructor(body) {
     this.body = body;
-    this.error = [];
+    this.errors = [];
     this.user = null;
   }
 
-  register() {
+  async register() {
     this.validate();
+    if(this.errors.length > 0) return;
+
+    this.user = await LoginModel.create(this.body)
   }
 
   validate() {
     this.cleanUp();
     // validate Email
-    if(!validator.isEmail(this.body.email)) this.error.push('Invalid Email');
+    if(!validator.isEmail(this.body.email)) this.errors.push('Invalid Email');
 
-    if(this.body.password.length < 3 || this.body.password)
+    if(this.body.password.length < 3 || this.body.password.length > 50) {
+      this.errors.push('Password length need be bigest than 3 chars')
+    }
 
   }
 
