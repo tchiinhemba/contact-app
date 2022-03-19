@@ -20,6 +20,8 @@ class Login {
     this.validate();
     if (this.errors.length > 0) return;
 
+    await this.userExists();
+
     try {
       const salt = bcryptjs.genSaltSync();
       this.body.password = bcryptjs.hashSync(this.body.password, salt);
@@ -28,6 +30,12 @@ class Login {
       console.log(error)
 
     }
+  }
+
+  async userExists() {
+    const user = await LoginModel.findOne({ email: this.body.email });
+
+    if(user) this.errors.push('User Exists!')
   }
 
   validate() {

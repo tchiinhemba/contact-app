@@ -1,4 +1,4 @@
 exports.index = (req, res) => {
-    res.render('login');
+    res.render('index');
     return;
   };
