@@ -10,29 +10,24 @@ exports.index = (req, res) => {
 
 exports.register = async function (req, res) {
 
-
     try {
         const login = new Login(req.body);
         await login.register();
 
         if (login.errors.length > 0) {
             req.flash('Errors', login.errors);
-            req.session.save(function () {
-                return res.redirect('back')
-            })
-            return
+            req.session.save(() => res.redirect('/login/index'))
+            return;
         }
+
         req.flash('Success', 'User has successful created!');
-        req.session.save(function () {
-            return res.redirect('back')
-        })
+        req.session.save(() => res.redirect('/login/index'))
+        return
 
     } catch (error) {
         console.log(error)
-        res.render('404');
-
+        return res.render('404');
     }
-
 }
 
 
@@ -43,23 +38,20 @@ exports.login = async (req, res) => {
         const login = new Login(req.body);
         await login.login();
 
-        if(login.errors.length > 0) {
+        if (login.errors.length > 0) {
             req.flash('Errors', login.errors);
-            req.session.save(() => {
-                return res.redirect('back')
-            });
+            req.session.save(() => res.redirect('/login/index'));
             return;
         }
 
+        req.flash('Success', 'Success Loged')
+        req.session.user = login.user;
+        req.session.save(() => res.redirect('/login/index'))
+        return;
 
-        req.flash('success', 'Success Loged')
-        req.session.user = login.user
-        req.session.save(() =>  {
-            return res.redirect('back')
-        })
     } catch (error) {
         console.log(error)
         return res.render('404');
     }
-    
+
 }
