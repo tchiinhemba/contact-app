@@ -26,7 +26,7 @@ exports.middlewareGlobal = (req, res, next) => {
   exports.loginRequired = (req, res, next) => {
 
     if(!req.session.user) {
-      req.flash('errors', 'You need login.')
+      req.flash('errors', 'You need Sign In.')
       req.session.save((() => { res.redirect('/')}));
       return;
     }
