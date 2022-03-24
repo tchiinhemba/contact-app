@@ -5,7 +5,11 @@ const validator = require('validator');
 
 const ContactSchema = new mongoose.Schema(
     {
-
+        name: { type: String, required: true },
+        surname: { type: String, required: true, default: '' },
+        email: { type: String, required: true, default: '' },
+        phone: { type: String, required: true, default: '' },
+        createAt: { type: Date, default: Date.now }
     }
 )
 
@@ -19,34 +23,70 @@ function Contact(body) {
 }
 
 
-Contact.prototype.register = function() {
+
+Contact.prototype.register = async function () {
     this.validate()
+    if (this.errors.length > 0) return;
+    this.contact = await ContactModel.create(this.body)
+
 }
 
-Contact.prototype.register.validate = function() {
+Contact.prototype.validate = function () {
     this.cleanUp();
     // validate Email
-    if (!validator.isEmail(this.body.email)) this.errors.push('Invalid Email');
+    if (this.body.email && !validator.isEmail(this.body.email)) this.errors.push('Invalid Email');
+    if (!this.body.name) this.errors.push('Name is Required!');
+    if (!this.body.email && !this.body.phone) this.errors.push('Pelo menos um contacto deve ser enviado');
 
-    if (this.body.password.length < 3 || this.body.password.length > 50) {
-      this.errors.push('Password length need be bigest than 3 chars')
-    }
+}
 
-  }
-
-  Contact.prototype.cleanUp = function() {
+Contact.prototype.cleanUp = function () {
     for (const key in this.body) {
-      if (typeof this.body[key] !== 'string') {
-        this.body[key] = '';
-      }
+        if (typeof this.body[key] !== 'string') {
+            this.body[key] = '';
+        }
     }
 
     this.body = {
-      email: this.body.email,
-      password: this.body.password
+        name: this.body.name,
+        surname: this.body.surname,
+        email: this.body.email,
+        phone: this.body.phone,
     }
-  }
+}
 
 
 
-module.exports = Contact;
+Contact.prototype.edit = async function (id) {
+    if (typeof id !== 'string') return;
+    this.validate();
+    if (this.errors.length > 0) return;
+    this.contact = await ContactModel.findByIdAndUpdate(id, this.body, { new: true });
+}
+
+
+
+
+// Static Methods
+
+Contact.searchForId = async function (id) {
+
+    if (typeof id !== 'string') return;
+    const contact = await ContactModel.findById(id);
+    return contact;
+}
+
+Contact.searchContacts = async function () {
+    const contacts = await ContactModel.find()
+        .sort({ createAt: -1 });
+    return contacts;
+}
+
+Contact.delete = async function (id) {
+    if(typeof id !== 'string') return;
+
+    const contact = await ContactModel.findOneAndDelete({ _id: id })
+    return contact;
+}
+
+module.exports = Contact; 
