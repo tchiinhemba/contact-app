@@ -9,7 +9,7 @@ const ContactSchema = new mongoose.Schema(
         surname: { type: String, required: true, default: '' },
         email: { type: String, required: true, default: '' },
         phone: { type: String, required: true, default: '' },
-        phone: { type: Date, default: Date.now }
+        createAt: { type: Date, default: Date.now }
     }
 )
 
@@ -23,18 +23,12 @@ function Contact(body) {
 }
 
 
-Contact.searchForId = async function (id) {
-
-    if(typeof id !== 'string') return;
-    const user = await ContactModel.findById(id);
-    return user;
-}
 
 Contact.prototype.register = async function () {
     this.validate()
-    if( this.errors.length > 0 ) return;
+    if (this.errors.length > 0) return;
     this.contact = await ContactModel.create(this.body)
-    
+
 }
 
 Contact.prototype.validate = function () {
@@ -44,7 +38,7 @@ Contact.prototype.validate = function () {
     if (!this.body.name) this.errors.push('Name is Required!');
     if (!this.body.email && !this.body.phone) this.errors.push('Pelo menos um contacto deve ser enviado');
 
-  }
+}
 
 Contact.prototype.cleanUp = function () {
     for (const key in this.body) {
@@ -63,4 +57,29 @@ Contact.prototype.cleanUp = function () {
 
 
 
-module.exports = Contact;
+Contact.prototype.edit = async function (id) {
+    if (typeof id !== 'string') return;
+    this.validate();
+    if (this.errors.length > 0) return;
+    this.contact = await ContactModel.findByIdAndUpdate(id, this.body, { new: true });
+}
+
+
+
+
+// Static Methods
+
+Contact.searchForId = async function (id) {
+
+    if (typeof id !== 'string') return;
+    const contact = await ContactModel.findById(id);
+    return contact;
+}
+
+Contact.searchContacts = async function () {
+    const contacts = await ContactModel.find()
+        .sort({ createAt: -1 });
+    return contacts;
+}
+
+module.exports = Contact; 
