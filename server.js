@@ -5,14 +5,20 @@ const mongoose = require('mongoose');
 
 
 
-mongoose.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(
+  process.env.MONGO_DB,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }
+)
   .then(() => {
     app.emit('pronto');
   })
   .catch(e => console.log(e));
 
 
-  
+
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
